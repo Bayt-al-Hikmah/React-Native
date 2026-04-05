@@ -264,6 +264,75 @@ If the array of section objects isn’t formatted correctly, we can use the `SEC
 	renderSectionHeader={({ section }) => <Text>{section.title}</Text>}  
 />
 ```
+### SafeAreaView 
+The `SafeAreaView` component ensures that the content of our application is displayed within the safe area boundaries of a device screen. Modern smartphones may have notches, rounded corners, or system UI elements (such as the status bar or home indicator) that can overlap with the app interface. `SafeAreaView` automatically adds the necessary padding so that our content remains visible and properly positioned on all devices.
+
+ `SafeAreaView` is imported from the ``react-native-safe-area-context`` package, which provides better cross-platform support.
+```tsx
+import React from "react";  
+import { Text, StyleSheet } from "react-native";  
+import { SafeAreaView } from "react-native-safe-area-context";  
+  
+export default function App() {  
+  return (  
+    <SafeAreaView style={styles.container}>  
+      <Text>Hello! This content is inside the safe area.</Text>  
+    </SafeAreaView>  
+  );  
+}  
+  
+const styles = StyleSheet.create({  
+  container: {  
+    flex: 1,  
+    alignItems: "center",  
+    justifyContent: "center",  
+  },  
+});
+```
+In this example, the `SafeAreaView` wraps the main content of the application. This ensures that the text is displayed within the visible and safe region of the screen, avoiding overlaps with device-specific UI elements.
+### KeyboardAvoidingView
+The `KeyboardAvoidingView` component helps prevent the on-screen keyboard from covering important UI elements, such as text inputs or buttons. When the keyboard appears, this component automatically adjusts the layout by moving or resizing the view so that the focused input remains visible to the user.
+
+This is especially useful in forms or login screens where users interact with input fields while the keyboard is open.
+```tsx
+import React, { useState } from "react";  
+import { View, TextInput, Button, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";  
+  
+export default function App() {  
+  const [text, setText] = useState("");  
+
+  return (  
+    <KeyboardAvoidingView  
+      style={styles.container}  
+      behavior={Platform.OS === "ios" ? "padding" : "height"}  
+    >  
+      <TextInput  
+        style={styles.input}  
+        placeholder="Type something..."  
+        value={text}  
+        onChangeText={setText}  
+      />  
+      <Button title="Submit" onPress={() => alert(text)} />  
+    </KeyboardAvoidingView>  
+  );  
+}  
+  
+const styles = StyleSheet.create({  
+  container: {  
+    flex: 1,  
+    justifyContent: "center",  
+    padding: 20,  
+  },  
+  input: {  
+    height: 40,  
+    borderWidth: 1,  
+    borderColor: "gray",  
+    marginBottom: 10,  
+    paddingHorizontal: 10,  
+  },  
+});
+```
+In this example, `KeyboardAvoidingView` wraps the input and button. When the keyboard appears, the view automatically adjusts its layout so the `TextInput` remains visible and accessible. The `behavior` property controls how the view reacts to the keyboard, with different options commonly used for iOS and Android.
 
 ### ScrollView
 The `View` component good at grouping elements but it have small problem, when our app content exceeds the screen size it .... to ssolve this we use `ScrollView`, the **ScrollView** component allows us to create a scrollable container that can hold multiple components, including `View`, `Text`, `Image`, and even lists.   

@@ -10,31 +10,31 @@ export default function App() {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   
   useEffect(() => {
-    const loadTasks = async () => {
-      try {
-        const storedTasks = await AsyncStorage.getItem("tasks");
-        if (storedTasks) {
-          setTasks(JSON.parse(storedTasks));
-        }
-      } catch (error) {
-        console.error("Failed to load tasks:", error);
-      }
-    };
-    loadTasks();
-  }, []);
+    const loadTasks = async () => {
+      try {
+        const storedTasks = await AsyncStorage.getItem("tasks");
+        if (storedTasks) {
+          setTasks(JSON.parse(storedTasks));
+        }
+      } catch (error) {
+        console.error("Failed to load tasks:", error);
+      }
+    };
+    loadTasks();
+  }, []);
 
  
 
   useEffect(() => {
-    const saveTasks = async () => {
-      try {
-        await AsyncStorage.setItem("tasks", JSON.stringify(tasks));
-      } catch (error) {
-        console.error("Failed to save tasks:", error);
-      }
-    };
-    saveTasks();
-  }, [tasks]);
+    const saveTasks = async () => {
+      try {
+        await AsyncStorage.setItem("tasks", JSON.stringify(tasks));
+      } catch (error) {
+        console.error("Failed to save tasks:", error);
+      }
+    };
+    saveTasks();
+  }, [tasks]);
 
   const addTask = () => {
     if (!task.trim()) return;
