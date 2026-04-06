@@ -940,77 +940,75 @@ module.exports = {
 - **`useAnimatedStyle`:** A hook that creates a dynamic style object. It automatically updates the component's styling on the UI thread whenever our shared values change, without triggering a React re-render.
 - **Modifiers (`withTiming`, `withSpring`):** Functions that dictate how a shared value transitions from one state to another. `withTiming` provides smooth, duration-based transitions using easing curves, while `withSpring` uses physics-based properties (like mass and damping) for organic, bouncy movements.
 
-Let’s create a  modern, infinite loading spinner. We must import from `react-native-reanimated` and use `Animated.View` instead of a standard `View`.   
-The loader represents a **circular spinning indicator**, it consists of a circular track and a partially visible circular ring that rotates continuously. The grey circle acts as the static base (track), while the blue arc acts as the rotating indicator. Because the top border of the blue circle is transparent, only part of the ring is visible. When this ring rotates, it creates the illusion of a moving arc traveling around the circle, which is what produces the familiar loading animation.
+Let’s create a modern bouncing ping-pong loader animation. This loader represents a single ball bouncing vertically, similar to a ping-pong ball repeatedly hitting the ground and bouncing back up. The layout consists of a vertical track that acts as the movement space, while the blue circle represents the ball itself. The ball starts at the bottom of the track and animates upward before falling back down.
 ```tsx
-import React, { useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useEffect } from "react";
+import { View, StyleSheet } from "react-native";
 
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, withRepeat, Easing, interpolate } from 'react-native-reanimated';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+  Easing,
+} from "react-native-reanimated";
 
-export default function ModernLoader() {
-  const rotation = useSharedValue(0);
+export default function PingPongLoader() {
+  const translateY = useSharedValue(0);
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ rotate: `${rotation.value}deg` }],
-    };
-  });
-  
   useEffect(() => {
-    rotation.value = withRepeat(
-      withTiming(360, {
-        duration: 1000,
-        easing: Easing.bezier(0.4, 0, 0.2, 1),
+    translateY.value = withRepeat(
+      withTiming(-120, {
+        duration: 600,
+        easing: Easing.inOut(Easing.quad),
       }),
-      -1
+      -1,
+      true 
     );
   }, []);
 
-  
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateY: translateY.value }],
+    };
+  });
 
   return (
     <View style={styles.container}>
       <View style={styles.track}>
-        <Animated.View style={[styles.indicator, animatedStyle]} />
+        <Animated.View style={[styles.ball, animatedStyle]} />
       </View>
     </View>
   );
-} 
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#F5F7FA',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F5F7FA",
   },
+
   track: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 5,
-    borderColor: '#E1E8ED',
-    justifyContent: 'center',
-    alignItems: 'center',
+    height: 150,
+    justifyContent: "flex-end",
   },
-  indicator: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 5,
-    borderColor: '#007AFF',
-    borderTopColor: 'transparent',
-    position: 'absolute',
+
+  ball: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: "#007AFF",
   },
 });
 ```
-To apply the animation, we started by creating and initializing a numeric animation state using `useSharedValue`, specifically a variable named `rotation` with an initial value of `0`. This value represents the current rotation angle of the loader indicato, it acts as the main driver of the animation.
+To apply the animation, we start by creating a numeric animation state using ``useSharedValue``. In this case, the variable is named ``translateY`` and it is initialized with a value of 0. This value represents the vertical position of the ball along the Y-axis and acts as the main driver of the animation.
 
-Next, we connected this shared value to the component's visual style using the `useAnimatedStyle` hook. This hook allows us to dynamically compute styles based on the current value of `rotation`. Inside the hook, the numeric value is mapped to a `transform` property using `rotate`. Since rotation in React Native requires a string with a unit, the value is formatted as `${rotation.value}deg`. 
+Next, this shared value is connected to the component's visual style using the ``useAnimatedStyle`` hook. This hook allows styles to react automatically whenever the shared value changes. Inside the hook, the current value of ``translateY`` is mapped to the transform property using ``translateY``. As the value changes, the ball moves vertically on the screen.
 
-After establishing the animated style, we configured the animation behavior inside the `useEffect` hook. Here, the value of `rotation` is animated using `withTiming`, which gradually changes the value from `0` to `360`. This represents one full rotation of the loader. The animation is set to last 1000 milliseconds, creating a smooth one-second spin. To improve the natural feel of the motion, an easing curve `Easing.bezier(0.4, 0, 0.2, 1)` is applied so that the movement accelerates and decelerates smoothly rather than moving at a constant speed.
+After defining the animated style, the animation itself is configured inside the ``useEffect`` hook. The value of ``translateY`` is animated using ``withTiming``, which smoothly transitions the value from 0 to -120. This causes the ball to move 120 pixels upward from its starting position. The animation runs for 600 milliseconds and uses ``Easing.inOut(Easing.quad)`` to create a more natural motion where the ball accelerates at the start and slows down near the end.
 
-To make the loader spin continuously, the timing animation is wrapped with `withRepeat`. By passing `-1` as the repeat count, the animation loops indefinitely. This means that once the rotation reaches `360` degrees, it immediately restarts from the beginning, producing a seamless infinite spinning effect.
+To simulate the bouncing effect, the timing animation is wrapped with ``withRepeat``. The repeat count is set to -1, which means the animation runs indefinitely. The third argument is set to ``true``, which enables reverse mode. Instead of restarting from the beginning after reaching ``-120``, the animation reverses direction and moves back down to ``0``. This continuous up-and-down movement creates the illusion of a ping-pong ball bouncing vertically.
 
-Finally, the animated style is applied to an `Animated.View` component, which represents the blue indicator ring. Combined with the styling trick of hiding the top border segment (`borderTopColor: 'transparent'`), the rotating ring creates the visual illusion of a moving arc around the circular track, producing a modern loading indicator.
+Finally, the animated style is applied to an Animated.View component that represents the ball. The surrounding track container aligns the ball at the bottom using ``justifyContent: "flex-end"``, so the animation appears as a ball bouncing upward and falling back down repeatedly. 
