@@ -2,7 +2,7 @@
 
 ## Objectives
 - Working with Gestures
-
+- Exploring Device Sensors
 ## Gestures
 When designing for desktop, our primary interaction tools are the mouse and keyboard. We point, click, hover, and type. But mobile interaction is fundamentally different. A smartphone screen is an intimate, tactile canvas where users physically touch the interface. We don’t just click; we tap, drag, swipe, pinch, and rotate.
 
